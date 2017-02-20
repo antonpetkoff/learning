@@ -1,0 +1,14 @@
+UID PID STIME COMMAND
+root 23787 13:36 /bin/chroot
+lora 23791 13:36 /bin/rsync
+milena 23792 13:36 /bin/dmidecode
+vasilen 23843 13:50 /bin/dd
+panayot 23847 13:58 /bin/ls -alhtris
+dancho 23848 13:58 /bin/cat
+manuela 23849 13:58 /bin/gz
+dimitar 23891 14:36 /bin/tar
+irina 23892 14:36 /bin/lspci
+sendmail 23943 14:50 /bin/date
+georgi 23947 14:58 /bin/lvdisplay
+liubomir 23948 14:58 /bin/vgdisplay
+asen 23949 14:58 /bin/uname -a

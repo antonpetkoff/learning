@@ -1,0 +1,54 @@
+structure size = 10000000
+each test is averaged after 10 repetitions
+
+listCons:		831 ms
+listRandomAccess:	6997 ms
+listLinearAccess:	1029 ms
+listRandomUpdate:	14529 ms
+listLinearUpdate:	3240 ms
+listTail:		300 ms
+
+vectorConj:		5134 ms
+vectorRandomAccess:	2970 ms
+vectorLinearAccess:	148 ms
+vectorRandomUpdate:	6716 ms
+vectorLinearUpdate:	3481 ms
+vectorPop:		4577 ms
+
+------------------------------------------
+
+structure size = 1000000
+each test is averaged after 10 repetitions
+
+listCons:		35 ms
+listRandomAccess:	593 ms
+listLinearAccess:	83 ms
+listRandomUpdate:	700 ms
+listLinearUpdate:	199 ms
+listTail:		9 ms
+
+vectorConj:		400 ms
+vectorRandomAccess:	206 ms
+vectorLinearAccess:	14 ms
+vectorRandomUpdate:	423 ms
+vectorLinearUpdate:	271 ms
+vectorPop:		429 ms
+
+------------------------------------------
+
+structure size = 100000
+each test is averaged after 10 repetitions
+
+listCons:		4 ms
+listRandomAccess:	44 ms
+listLinearAccess:	11 ms
+listRandomUpdate:	72 ms
+listLinearUpdate:	17 ms
+listTail:		2 ms
+
+vectorConj:		62 ms
+vectorRandomAccess:	15 ms
+vectorLinearAccess:	3 ms
+vectorRandomUpdate:	34 ms
+vectorLinearUpdate:	24 ms
+vectorPop:		42 ms

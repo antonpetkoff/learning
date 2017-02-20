@@ -1,0 +1,6 @@
+<div>
+	<img src="madonna.jpg" encoding="UTF8"/>
+	<p encoding="UTF8">myParagraph</p>
+	<p encoding="UTF8">myParagraph2</p>
+	<img src="madonna.jpg" encoding="Windows1251"/>
+</div>
