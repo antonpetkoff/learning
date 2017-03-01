@@ -68,11 +68,14 @@ sorted(L) :- not(
 %% p3(X, Y) := Всеки елемент на X е в някой елемент на Y.
 %% p4(X, Y) := Всеки елемент на X е във всеки елемент на Y.
 
+%% ∃ A ∈ X ∃ B ∈ Y (A ∈ B)
 p1(X, Y) :-
     member(A, X),   % take some element A from the first list
     member(B, Y),   % take some element B from the second list
     member(A, B).   % check if A is a member of B
 
+%%    ∃ A ∈ X ∀ B ∈ Y (A ∈ B)
+%% ≡ ∃ A ∈ X ¬∃ B ∈ Y ¬(A ∈ B)
 p2(X, Y) :-
     member(A, X),   % take some element A from the first list
     not(
@@ -80,12 +83,17 @@ p2(X, Y) :-
         not(member(A, B))   % and A is not a member of B
     ).
 
+%%     ∀ A ∈ X ∃ B ∈ Y (A ∈ B)
+%% ≡ ¬∃ A ∈ X ¬∃ B ∈ Y (A ∈ B)
 p3(X, Y) :- not(
     member(A, X),
     not(member(B, Y)),
     member(A, B)
 ).
 
+%%    ∀ A ∈ X ∀ B ∈ Y (A ∈ B)
+%% ≡ ¬∃ A ∈ X ¬¬∃ B ∈ Y ¬(A ∈ B)
+%% ≡ ¬∃ A ∈ X ∃ B ∈ Y ¬(A ∈ B)
 p4(X, Y) :- not(
     member(A, X),
     member(B, Y),
