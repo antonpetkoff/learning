@@ -13,7 +13,7 @@ last(X, [X]).
 secondLast(X, [X, _]).
 secondLast(X, [_ | T]) :- secondLast(X, T).
 
-%% member(X, L)
+%% member(X, L) - is X a member of list L
 %% member(X, [X | _]).
 %% member(X, [_ | T]) :- member(X, T).
 
@@ -48,16 +48,16 @@ perm([H | P], L) :-
 %% less(X, Y). X is less than Y
 less(X, Y) :- X < Y.
 
-%% sorted(L).
-%% sorted([]).
-%% sorted([_]).
-%% sorted([A, B | T]) :- less(A, B), sorted([B | T]).
+sorted(L).
+sorted([]).
+sorted([_]).
+sorted([A, B | T]) :- less(A, B), sorted([B | T]).
 
 %% sorted with Exists
-sorted(L) :- not(
-    append(_, [A, B | _], L),
-    not(less(A, B))
-).
+%% sorted(L) :- not(
+%%     append(_, [A, B | _], L),
+%%     not(less(A, B))
+%% ).
 
 %% task from exam:
 %% X is a list of numbers
