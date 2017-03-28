@@ -3,30 +3,35 @@ $clean_data = array();
 $errors = array();
 
 if ($_POST) {
-  $input_title = $_POST['title'];
-  if ($input_title && strlen($input_title) < 150) {
-    $clean_data['title'] = $input_title;
+  $title = $_POST['title'];
+  $teacher = $_POST['teacher'];
+  $description = $_POST['description'];
+  $credits = $_POST['credits'];
+
+  if ($title && strlen($title) <= 150) {
+    $clean_data['title'] = $title;
   } else {
-    $errors['title'] = 'Името е задължително поле с максимална дължина 150 символа.';
+    $errors['title'] = '* задължително, с максимална дължина - 150 символа';
+  }
+
+  if ($teacher && strlen($teacher) <= 200) {
+    $clean_data['teacher'] = $teacher;
+  } else {
+    $errors['teacher'] = '* задължително, с максимална дължина - 200 символа';
+  }
+
+  if ($description && strlen($description) >= 10) {
+    $clean_data['description'] = $description;
+  } else {
+    $errors['description'] = '* задължително, минимална дължина - 10 символа';
+  }
+
+  if ($credits && $credits > 0) {
+    $clean_data['credits'] = $credits;
+  } else {
+    $errors['credits'] = '* цяло положително число';
   }
 }
-
-// TODO: field validation
-
-// function required($field, $errors) {
-//   if (!$_POST || !$_POST[$field]) {
-//     $errors['field'] =
-//   }
-// }
-
-// $fields = array(
-//   array(
-//     'name' => 'title',
-//     'type' => 'text',
-//     'label' => 'Заглавие',
-//     'validators' => array(required)
-//   )
-// );
 
 ?>
 
@@ -40,46 +45,47 @@ if ($_POST) {
   <h1>Добавяне на курс</h1>
   <form method="post" action="">
     <p>
-      <label for="title">Заглавие</label>
+      <label for="title">Име на предмета</label>
       <input type="text" name="title" id="title"></input>
-
+      <?php if (array_key_exists('title', $errors)) {echo $errors['title'];} ?>
     </p>
     <p>
       <label for="teacher">Преподавател</label>
       <input type="text" name="teacher" id="teacher"></input>
-    </p>
-    <p>
-      <label for="credits">Кредити</label>
-      <input type="number" step="0.5" name="credits" id="credits"></input>
-    </p>
-    <p>
-      <label for="category">Категория</label>
-      <select name="category">
-        <option>ЯКН</option>
-        <option>ОКН</option>
-        <option>ПМ</option>
-        <option>Ст</option>
-        <option>М</option>
-      </select>
-    </p>
-    <p>
-      <label for="capacity">Брой хора</label>
-      <input type="number" name="capacity" id="capacity"></input>
+      <?php if (array_key_exists('teacher', $errors)) {echo $errors['teacher'];} ?>
     </p>
     <p>
       <label for="description">Описание</label>
       <textarea name="description"></textarea>
+      <?php if (array_key_exists('description', $errors)) {echo $errors['description'];} ?>
+    </p>
+    <p>
+      <label for="category">Група</label>
+      <select name="category">
+        <option>М</option>
+        <option>ПМ</option>
+        <option>ОКН</option>
+        <option>ЯКН</option>
+      </select>
+      <?php if (array_key_exists('category', $errors)) {echo $errors['category'];} ?>
+    </p>
+    <p>
+      <label for="credits">Кредити</label>
+      <input type="number" name="credits" id="credits"></input>
+      <?php if (array_key_exists('credits', $errors)) {echo $errors['credits'];} ?>
     </p>
     <input type="submit" value="Добави">
   </form>
 
   <?php
     // print what was saved
-    if ($clean_data) {
+    if (!$errors && $clean_data) {
       echo '<h2>Избираемата е записана успешно:</h2>';
       foreach ($clean_data as $key => $value) {
-        echo '<li>' . $key . ' => ' . $value . '</li>';
+        echo '<li>' . $key . ': ' . $value . '</li>';
       }
+    } else {
+      echo '<h2>Грешка: Имате неправилно попълнени полета!</h2>';
     }
   ?>
 </body>
