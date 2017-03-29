@@ -14,8 +14,23 @@ sum([H | T], Sum) :- sum(T, SumTail), Sum is SumTail + H.
 splits([], []).
 splits(L, [H | M]) :- append(H, T, L), H \= [], splits(T, M).
 
-between(A, A, B) :- A =< B. %% TODO: why doesn't it work when there isn't A =< B?
+between(A, A, B) :- A =< B. %% Ensure that the input is correct
 between(X, A, B) :- A < B, A1 is A + 1, between(X, A1, B).
 
 sums(0, []).
 sums(N, [H | T]) :- between(H, 1, N), Nrest is N - H, sums(Nrest, T).
+
+out(L, X, R) :- append(H, [X | T], L), append(H, T, R).
+
+perm([], []).
+perm(L, [X | P]) :- out(L, X, Rest), perm(Rest, P).
+
+prefix(L, P) :- append(P, _, L).
+
+suffix(L, S) :- append(_, S, L).
+
+sublist(List, Sub) :- suffix(List, Suff), prefix(Suff, Sub).
+
+subset([], []).
+%% subset(L, S) :- out(L, X, R), subset(R, S).
+subset(L, Sub) :- suffix(L, [H | Suff]), subset(Suff, Sub).
