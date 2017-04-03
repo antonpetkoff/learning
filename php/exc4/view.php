@@ -21,8 +21,6 @@ if (!$row) {
 
 <h1><?php echo $row['title']; ?></h1>
 
-<h2><?php echo $row['teacher']; ?></h2>
+<h2><?php echo $row['lecturer']; ?></h2>
 
 <p><?php echo $row['description']; ?></p>
-
-<p><?php echo $row['credits']; ?></p>

@@ -17,15 +17,11 @@ if ($_GET) {
   if (!$row) {
     die("Elective not found!");
   }
-} else if ($_PUT) {
-  $id = $_PUT['id'];
-
-  echo $id;
 }
 
 ?>
 
-<form method="put">
+<form method="post" action="<?php echo "update.php?id={$id}"; ?>">
   <p>
     <label for="title">Title</label>
     <input type="text" name="title" value="<?php echo $row['title']; ?>" />
@@ -35,12 +31,8 @@ if ($_GET) {
     <input type="text" name="description" value="<?php echo $row['description']; ?>" />
   </p>
   <p>
-    <label for="teacher">Teacher</label>
-    <input type="text" name="teacher" value="<?php echo $row['teacher']; ?>" />
-  </p>
-  <p>
-    <label for="credits">Credits</label>
-    <input type="text" name="credits" value="<?php echo $row['credits']; ?>" />
+    <label for="lecturer">Lecturer</label>
+    <input type="text" name="lecturer" value="<?php echo $row['lecturer']; ?>" />
   </p>
   <input type="submit" value="Edit Elective" />
 </form>

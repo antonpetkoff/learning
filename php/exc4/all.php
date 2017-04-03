@@ -9,6 +9,8 @@ $conn = new PDO("mysql:host=$host;dbname=$db", $user, $pass);
 $sql     = "SELECT * FROM electives";
 $query   = $conn->query($sql) or die("failed!");
 
+echo "<a href=\"add.php\">Add elective</a>";
+
 echo "<ul>";
 while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
   $edit_link = "<a href=\"edit.php?id={$row['id']}\">[Edit]</a>";
