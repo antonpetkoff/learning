@@ -18,7 +18,7 @@ p(X, Y, X1, Y1, R, X2, Y2, X3, Y3) :-
 
 %% task 2
 %% [] is a binary tree
-%% is A and B are binary trees, then [A, B] is a binary tree
+%% if A and B are binary trees, then [A, B] is a binary tree
 %% t(T) generates all binary trees T
 %% note: we only have the structure, but no labels of the vertices
 %% an empty leaf is just [[],[]]
@@ -41,7 +41,7 @@ n(X) :- n(Y), X is Y + 1.
 
 %% vertex_count(A) + vertex_count(B) + 1 = N
 t([], 0).
-t([A, B], N) :-
+t([A, B], N) :- %% TODO: if you use [A | B], instead of [A, B], you will generate n-ary trees
     N > 0,
     N1 is N - 1,    %% remove the root
     between(NA, 0, N1), %% let NA = vertex_count(A)
