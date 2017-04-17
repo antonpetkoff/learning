@@ -32,5 +32,4 @@ suffix(L, S) :- append(_, S, L).
 sublist(List, Sub) :- suffix(List, Suff), prefix(Suff, Sub).
 
 subset([], []).
-%% subset(L, S) :- out(L, X, R), subset(R, S).
-subset(L, Sub) :- suffix(L, [H | Suff]), subset(Suff, Sub).
+subset(L, [H | T]) :- suffix(L, [H | S]), subset(S, T).
