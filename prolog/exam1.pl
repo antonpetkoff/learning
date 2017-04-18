@@ -39,3 +39,17 @@ concat(S, L, K) :-
     K is K1 + 1.
 
 q(L, X) :- member(X, L), concat(X, L, N), N > 1.
+
+%% task 2-2 (analogous to the previous task)
+%% r(L, N) generates all numbers N from L which
+%% are formed by the sum of at least 2 numbers in L
+
+sum(0, _, 0).
+sum(S, L, K) :-
+    member(X, L),
+    R is S - X,
+    R >= 0,
+    sum(R, L, K1),
+    K is K1 + 1.
+
+r(L, N) :- member(X, L), sum(X, L, N), N > 1.
