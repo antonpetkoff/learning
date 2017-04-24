@@ -1,0 +1,1 @@
+<h2><?php echo $params->visits; ?></h2>
