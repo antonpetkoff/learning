@@ -46,3 +46,24 @@ between(A, B, X) :- A < B, A1 is A + 1, between(A1, B, X).
 
 sums(0, []).
 sums(N, [X | Sums]) :- between(1, N, X), Rest is N - X, sums(Rest, Sums).
+
+n(0).
+n(N) :- n(X), N is X + 1.
+
+s(0, 0).
+s(X, Y) :- X > 0, Y is X.
+s(X, Y) :- X > 0, Y is -X.
+
+z(Z) :- n(N), s(N, Z).
+
+%% generate list L of K integers with total sum of N
+genKS(1, N, [X]) :- s(N, X).
+genKS(K, N, [S | Rest]) :-
+  K > 1,
+  between(0, N, X),
+  s(X, S),
+  K1 is K - 1,
+  N1 is N - X,
+  genKS(K1, N1, Rest).
+
+gen3(Triplet) :- n(N), genKS(3, N, Triplet).
