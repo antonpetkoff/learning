@@ -11,20 +11,6 @@ len([_ | T], Len) :- len(T, LenTail), Len is LenTail + 1.
 sum([], 0).
 sum([H | T], Sum) :- sum(T, SumTail), Sum is SumTail + H.
 
-splits([], []).
-splits(L, [H | M]) :- append(H, T, L), H \= [], splits(T, M).
-
-between(A, A, B) :- A =< B. %% Ensure that the input is correct
-between(X, A, B) :- A < B, A1 is A + 1, between(X, A1, B).
-
-sums(0, []).
-sums(N, [H | T]) :- between(H, 1, N), Nrest is N - H, sums(Nrest, T).
-
-out(L, X, R) :- append(H, [X | T], L), append(H, T, R).
-
-perm([], []).
-perm(L, [X | P]) :- out(L, X, Rest), perm(Rest, P).
-
 prefix(L, P) :- append(P, _, L).
 
 suffix(L, S) :- append(_, S, L).
@@ -33,3 +19,30 @@ sublist(List, Sub) :- suffix(List, Suff), prefix(Suff, Sub).
 
 subset([], []).
 subset(L, [H | T]) :- suffix(L, [H | S]), subset(S, T).
+
+remove(X, L, R) :- append(A, [X | B], L), append(A, B, R).
+
+min2(A, B, A) :- A < B.
+min2(A, B, B) :- not(A < B).
+
+min([X], X).
+min([H | T], M) :- min(T, TMin), min2(H, TMin, M).
+
+%% selection sort
+ssort([X], [X]).
+ssort(L, [Min | Sorted]) :-
+  min(L, Min),
+  remove(Min, L, Rest),
+  ssort(Rest, Sorted).
+
+perm([], []).
+perm(L, [Elem | Perm]) :- remove(Elem, L, Rest), perm(Rest, Perm).
+
+splits([], []).
+splits(L, [H | Splits]) :- append(H, Rest, L), H \= [], splits(Rest, Splits).
+
+between(A, B, A) :- A =< B.
+between(A, B, X) :- A < B, A1 is A + 1, between(A1, B, X).
+
+sums(0, []).
+sums(N, [X | Sums]) :- between(1, N, X), Rest is N - X, sums(Rest, Sums).
