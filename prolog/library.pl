@@ -67,3 +67,8 @@ genKS(K, N, [S | Rest]) :-
   genKS(K1, N1, Rest).
 
 gen3(Triplet) :- n(N), genKS(3, N, Triplet).
+
+doReverse([], R, R).
+doReverse([H | T], S, R) :- doReverse(T, [H | S], R).
+
+reverse(L, R) :- doReverse(L, [], R).
