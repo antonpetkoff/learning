@@ -82,7 +82,7 @@ struct config {
     }
 };
 
-class ConfigCompare {
+class config_comparator {
 public:
     bool operator()(const config& c1, const config& c2) const {
         for (int pos = 0; pos < c1.frogs.size(); ++pos) {
@@ -96,7 +96,7 @@ public:
     }
 };
 
-map<config, config, ConfigCompare> parent;
+map<config, config, config_comparator> parent;
 
 config dfs(config start) {
 //    unordered_set<config> visited;
