@@ -60,6 +60,22 @@ int manhattan_distance_to_goal(const config& conf) {
     return total_distance / 2;  // remove duplicates
 }
 
+int count_inversions(const vector<tile>& tiles) {
+    int count = 0;
+    for (int i = 0; i < tiles.size() - 1; ++i) {
+        for (int j = i + 1; j < tiles.size(); ++j) {
+            if (tiles[i] > tiles[j]) {
+                count++;
+            }
+        }
+    }
+    return count;
+}
+
+bool is_solvable(const config& conf) {
+
+}
+
 void sliding_blocks() {
     int game_size;
     cin >> game_size;                // e.g. 8-puzzle
@@ -76,14 +92,16 @@ void sliding_blocks() {
 }
 
 int main(int argc, const char* const* argv) {
-    sliding_blocks();
+    int run_tests = true;
 
-    cout << "Running tests..." << endl;
-    doctest::Context ctx;
-    ctx.applyCommandLine(argc, argv);
-//    int test_results = ctx.run();
-//    return test_results;
-    return 0;
+    if (run_tests) {
+        doctest::Context ctx;
+        ctx.applyCommandLine(argc, argv);
+        return ctx.run();
+    } else {
+        sliding_blocks();
+        return 0;
+    }
 }
 
 TEST_CASE("manhattan distance example from wikipedia") {
@@ -97,4 +115,12 @@ TEST_CASE("manhattan distance example from wikipedia") {
     config conf(tiles);
     int distance = manhattan_distance_to_goal(conf);
     CHECK(distance == 36);
+}
+
+
+TEST_CASE("count inversions") {
+    CHECK(0 == count_inversions({1, 2, 3, 4, 5, 6}));
+    CHECK(3 == count_inversions({3, 2, 1, 4, 5, 6}));
+    CHECK(10 == count_inversions({5, 4, 3, 2, 1}));
+    CHECK(4 == count_inversions({2, 4, 1, 5, 3}));
 }
