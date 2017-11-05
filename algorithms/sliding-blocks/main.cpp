@@ -1,8 +1,10 @@
 #define DOCTEST_CONFIG_IMPLEMENT
 #include "doctest.h"
 #include <iostream>
+#include <algorithm>
 #include <vector>
 #include <cmath>
+#include <queue>
 
 using namespace std;
 
@@ -16,8 +18,16 @@ typedef int tile;
 struct config {
 public:
     vector<tile> tiles;
+    int blank_tile_index;
 
-    config(const vector<tile> &_tiles) : tiles(_tiles) {}
+    config(const vector<tile> &_tiles, int _blank_tile_index = -1) : tiles(_tiles) {
+        if (_blank_tile_index == -1) {
+            auto blank_index = find(tiles.begin(), tiles.end(), 0);
+            blank_tile_index = (int) (blank_index - tiles.begin());
+        } else {
+            blank_tile_index = _blank_tile_index;
+        }
+    }
 
     friend ostream& operator<<(ostream& out, const config& conf) {
         const int n = sqrt(tiles_count);
@@ -190,4 +200,12 @@ TEST_CASE("check if puzzle is solvable") {
                                           5  , 6  , 7  , 8  ,
                                           9  , 10 , 11 , 12 ,
                                           13 , 14 , 15 , 0})), 4));
+}
+
+TEST_CASE("calculate blank tile index in configuration") {
+    CHECK(3 == config(vector<int>({1, 2, 3, 0, 5})).blank_tile_index);
+    CHECK(3 == config(vector<int>({1, 2, 3, 0, 5}), 3).blank_tile_index);
+    CHECK(1 == config(vector<int>({1, 0, 3, 2, 5})).blank_tile_index);
+    CHECK(1 == config(vector<int>({1, 0, 3, 8, 5}), 1).blank_tile_index);
+    CHECK(6 == config(vector<int>({1, 2, 3, 12, 5, 10, 0})).blank_tile_index);
 }
