@@ -6,12 +6,11 @@
 
 using namespace std;
 
-// check if puzzle is solvable
 // implement a*
 // define heuristic
 
 int tiles_count;
-int game_side;
+int grid_size;
 
 typedef int tile;
 struct config {
@@ -46,15 +45,15 @@ bool isGoal(const config& conf) {
     return true;
 }
 
-int manhattan_distance_to_goal(const config& conf, int game_side) {
+int manhattan_distance_to_goal(const config& conf, int grid_size) {
     int size = (int) conf.tiles.size();
     int total_distance = 0;
 
     for (int pos = 0; pos < size; ++pos) {
         tile t = conf.tiles[pos];
         int target_pos = t == 0 ? size - 1 : t - 1;
-        int diffX = abs(target_pos % game_side - pos % game_side);  // compare distances from left border
-        int diffY = abs(target_pos / game_side - pos / game_side);  // compare distances from top border
+        int diffX = abs(target_pos % grid_size - pos % grid_size);  // compare distances from left border
+        int diffY = abs(target_pos / grid_size - pos / grid_size);  // compare distances from top border
         total_distance += diffX + diffY;
     }
 
@@ -75,25 +74,37 @@ int count_inversions(const vector<tile>& tiles) {
 
 /**
  * @param tiles
- * @return zero-based row number of blank tile in tiles
+ * @return zero-based row number of blank tile in tiles, counting from the top
  */
-int get_blank_tile_row(const vector<tile>& tiles, int game_side) {
+int get_blank_tile_row(const vector<tile>& tiles, int grid_size) {
     for (int pos = (int)(tiles.size() - 1); pos >= 0; --pos) {
         if (tiles[pos] == 0) {
-            return pos / game_side;
+            return pos / grid_size;
         }
     }
 }
 
-bool is_solvable(const config& conf) {
+inline bool is_odd(int n) { return n % 2 == 1; }
 
+inline bool is_even(int n) { return !is_odd(n); }
+
+bool is_solvable(const config& conf, int grid_size) {
+    int inversions_count = count_inversions(conf.tiles);
+
+    if (is_odd(grid_size)) {
+        return is_even(inversions_count);
+    }
+
+    int blank_tile_row = get_blank_tile_row(conf.tiles, grid_size);
+
+    return is_odd(blank_tile_row) == is_odd(inversions_count);
 }
 
 void sliding_blocks() {
     int game_size;
     cin >> game_size;                // e.g. 8-puzzle
     tiles_count = game_size + 1;  // there are 9 squares
-    game_side = (int) sqrt(tiles_count);
+    grid_size = (int) sqrt(tiles_count);
 
     vector<tile> tiles((size_t) tiles_count);
     for (tile& t : tiles) {
@@ -118,7 +129,7 @@ int main(int argc, const char* const* argv) {
     }
 }
 
-TEST_CASE("manhattan distance") {
+TEST_CASE("manhattan distance to goal configuration") {
     // https://en.wikipedia.org/wiki/Admissible_heuristic
     CHECK(36 == manhattan_distance_to_goal(config(vector<tile>({4, 6, 3, 8,
                                                                 7, 12, 9, 14,
@@ -154,4 +165,29 @@ TEST_CASE("get zero-based row number of blank tile") {
                                    4, 9, 5, 11,
                                    6, 7, 8, 12,
                                    13, 14, 15, 0}, 4));
+}
+
+TEST_CASE("check if puzzle is solvable") {
+    CHECK(is_solvable(config(vector<tile>({1, 2, 3,
+                                           4, 0, 5,
+                                           6, 7, 8})), 3));
+
+    CHECK(!is_solvable(config(vector<tile>({1, 2, 3,
+                                            4, 4, 5,
+                                            8, 7, 0})), 3));
+
+    CHECK(!is_solvable(config(vector<int>({1  , 2  , 3  , 4  ,
+                                           5  , 6  , 7  , 8  ,
+                                           9  , 10 , 11 , 15 ,
+                                           13 , 14 , 12 , 0})), 4));
+
+    CHECK(!is_solvable(config(vector<int>({1  , 2  , 3  , 4  ,
+                                           5  , 6  , 7  , 8  ,
+                                           9  , 10 , 11 , 12 ,
+                                           13 , 15 , 14 , 0})), 4));
+
+    CHECK(is_solvable(config(vector<int>({1  , 2  , 3  , 4  ,
+                                          5  , 6  , 7  , 8  ,
+                                          9  , 10 , 11 , 12 ,
+                                          13 , 14 , 15 , 0})), 4));
 }
