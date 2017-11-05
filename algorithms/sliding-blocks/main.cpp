@@ -8,8 +8,10 @@
 
 using namespace std;
 
-// implement a*
-// define heuristic
+template <typename T>
+bool contains(const vector<T>& list, const T& item) {
+    return find(list.begin(), list.end(), item) != list.end();
+}
 
 int tiles_count;
 int grid_size;
@@ -33,6 +35,10 @@ public:
         return tiles == other.tiles && blank_tile_index == other.blank_tile_index;
     }
 
+    bool operator<(const config& other) const {
+        return false;   // TODO: mocked
+    }
+
     friend ostream& operator<<(ostream& out, const config& conf) {
         const int n = (int) sqrt(conf.tiles.size());
         for (int row = 0; row < n; ++row) {
@@ -49,7 +55,7 @@ public:
 };
 
 // distance is zero
-bool isGoal(const config& conf) {
+bool is_goal(const config& conf) {
     size_t size = conf.tiles.size();
     for (int i = 0; i < size; ++i) {
         if (conf.tiles[i] != (i + 1) % size) {
@@ -132,16 +138,48 @@ vector<config> generate_moves(const config& conf, int grid_size) {
     return moves;
 }
 
-//int a_star(const config& start, int grid_size) {
-//    // note: distance = edge weight = 1 in this problem
-//    // triple: (distance + heuristic, distance, (config, previous))
-//    priority_queue<pair<int, config>> queue;
-//    // TODO: generate next states
-//    //
-//
-//    // distance measures how much changes we made already on the start
-//    // the heuristic measures how far is the config from the goal
-//}
+config NULL_STATE = config(vector<tile>({}));
+
+int a_star(const config& start, int grid_size) {
+    // distance measures how much changes we made already on the start
+    // the heuristic measures how far is the config from the goal
+    typedef tuple<int, int, config, config> state;
+    vector<config> visited; // TODO: replace with unordered_set
+    priority_queue<state, vector<state>, greater<state>> queue;
+
+    queue.push(make_tuple(
+        0 + manhattan_distance_to_goal(start, grid_size),
+        0,
+        start,
+        NULL_STATE
+    ));
+
+    while (!queue.empty()) {
+        state current = queue.top(); queue.pop();
+        int distance = get<1>(current);
+        config conf = get<2>(current);
+        visited.push_back(conf);
+
+        if (is_goal(conf)) {
+            return distance;
+        }
+
+        for (config next : generate_moves(conf, grid_size)) {
+            if (contains<config>(visited, next)) {
+                continue;
+            }
+
+            queue.push(make_tuple(
+                distance + 1 + manhattan_distance_to_goal(next, grid_size),
+                distance + 1,
+                next,
+                conf
+            ));
+        }
+    }
+
+    return -1;
+}
 
 void sliding_blocks() {
     int game_size;
@@ -243,11 +281,6 @@ TEST_CASE("calculate blank tile index in configuration") {
     CHECK(6 == config(vector<int>({1, 2, 3, 12, 5, 10, 0})).blank_tile_index);
 }
 
-template <typename T>
-bool contains(const vector<T>& list, const T& item) {
-    return find(list.begin(), list.end(), item) != list.end();
-}
-
 TEST_CASE("generate next configurations") {
     vector<config> moves = generate_moves(config(vector<int>({1, 2, 3,
                                                               4, 0, 6,
@@ -270,4 +303,12 @@ TEST_CASE("generate next configurations") {
     CHECK(contains<config>(moves, config(vector<int>({1, 2, 3,
                                                       4, 5, 6,
                                                       7, 0, 8}))));
+}
+
+TEST_CASE("a star finds distance to goal") {
+    int distance_to_goal = a_star(config(vector<tile>({1, 2, 3,
+                                                       4, 5, 6,
+                                                       0, 7, 8})), 3);
+
+    CHECK(distance_to_goal == 2);
 }
