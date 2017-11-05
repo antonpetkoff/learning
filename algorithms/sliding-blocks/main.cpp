@@ -29,8 +29,12 @@ public:
         }
     }
 
+    bool operator==(const config& other) const {
+        return tiles == other.tiles && blank_tile_index == other.blank_tile_index;
+    }
+
     friend ostream& operator<<(ostream& out, const config& conf) {
-        const int n = sqrt(tiles_count);
+        const int n = (int) sqrt(conf.tiles.size());
         for (int row = 0; row < n; ++row) {
             for (int col = 0; col < n; ++col) {
                 if (col > 0) {
@@ -109,6 +113,35 @@ bool is_solvable(const config& conf, int grid_size) {
 
     return is_odd(blank_tile_row) == is_odd(inversions_count);
 }
+
+vector<config> generate_moves(const config& conf, int grid_size) {
+    vector<config> moves;
+
+    for (auto offset : {make_pair(-1, 0), make_pair(0, 1), make_pair(1, 0), make_pair(0, -1)}) {
+        int row_offset = offset.first;
+        int col_offset = offset.second;
+        int next_blank_pos = conf.blank_tile_index + grid_size * row_offset + col_offset;
+
+        if (0 <= next_blank_pos && next_blank_pos < conf.tiles.size()) {
+            vector<tile> new_tiles(conf.tiles);
+            swap(new_tiles[conf.blank_tile_index], new_tiles[next_blank_pos]);
+            moves.push_back(config(new_tiles, next_blank_pos));
+        }
+    }
+
+    return moves;
+}
+
+//int a_star(const config& start, int grid_size) {
+//    // note: distance = edge weight = 1 in this problem
+//    // triple: (distance + heuristic, distance, (config, previous))
+//    priority_queue<pair<int, config>> queue;
+//    // TODO: generate next states
+//    //
+//
+//    // distance measures how much changes we made already on the start
+//    // the heuristic measures how far is the config from the goal
+//}
 
 void sliding_blocks() {
     int game_size;
@@ -208,4 +241,33 @@ TEST_CASE("calculate blank tile index in configuration") {
     CHECK(1 == config(vector<int>({1, 0, 3, 2, 5})).blank_tile_index);
     CHECK(1 == config(vector<int>({1, 0, 3, 8, 5}), 1).blank_tile_index);
     CHECK(6 == config(vector<int>({1, 2, 3, 12, 5, 10, 0})).blank_tile_index);
+}
+
+template <typename T>
+bool contains(const vector<T>& list, const T& item) {
+    return find(list.begin(), list.end(), item) != list.end();
+}
+
+TEST_CASE("generate next configurations") {
+    vector<config> moves = generate_moves(config(vector<int>({1, 2, 3,
+                                                              4, 0, 6,
+                                                              7, 5, 8})), 3);
+
+    CHECK(4 == moves.size());
+
+    CHECK(contains<config>(moves, config(vector<int>({1, 0, 3,
+                                                      4, 2, 6,
+                                                      7, 5, 8}))));
+
+    CHECK(contains<config>(moves, config(vector<int>({1, 2, 3,
+                                                      0, 4, 6,
+                                                      7, 5, 8}))));
+
+    CHECK(contains<config>(moves, config(vector<int>({1, 2, 3,
+                                                      4, 6, 0,
+                                                      7, 5, 8}))));
+
+    CHECK(contains<config>(moves, config(vector<int>({1, 2, 3,
+                                                      4, 5, 6,
+                                                      7, 0, 8}))));
 }
