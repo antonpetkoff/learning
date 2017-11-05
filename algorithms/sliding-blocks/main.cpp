@@ -72,6 +72,19 @@ int count_inversions(const vector<tile>& tiles) {
     return count;
 }
 
+/**
+ * @param tiles
+ * @return zero-based row number of blank tile in tiles
+ */
+int get_blank_tile_row(const vector<tile>& tiles) {
+    int game_side = (int) sqrt(tiles.size());
+    for (int pos = (int)(tiles.size() - 1); pos >= 0; --pos) {
+        if (tiles[pos] == 0) {
+            return pos / game_side;
+        }
+    }
+}
+
 bool is_solvable(const config& conf) {
 
 }
@@ -123,4 +136,17 @@ TEST_CASE("count inversions") {
     CHECK(3 == count_inversions({3, 2, 1, 4, 5, 6}));
     CHECK(10 == count_inversions({5, 4, 3, 2, 1}));
     CHECK(4 == count_inversions({2, 4, 1, 5, 3}));
+}
+
+TEST_CASE("get zero-based row number of blank tile") {
+    CHECK(1 == get_blank_tile_row({1, 2, 3,
+                                   4, 0, 5,
+                                   6, 7, 8}));
+    CHECK(2 == get_blank_tile_row({1, 2, 3,
+                                   4, 8, 5,
+                                   6, 7, 0}));
+    CHECK(3 == get_blank_tile_row({1, 2, 3, 10,
+                                   4, 9, 5, 11,
+                                   6, 7, 8, 12,
+                                   13, 14, 15, 0}));
 }
