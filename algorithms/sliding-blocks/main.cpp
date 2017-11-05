@@ -11,6 +11,7 @@ using namespace std;
 // define heuristic
 
 int tiles_count;
+int game_side;
 
 typedef int tile;
 struct config {
@@ -45,19 +46,19 @@ bool isGoal(const config& conf) {
     return true;
 }
 
-int manhattan_distance_to_goal(const config& conf) {
+int manhattan_distance_to_goal(const config& conf, int game_side) {
     int size = (int) conf.tiles.size();
     int total_distance = 0;
 
     for (int pos = 0; pos < size; ++pos) {
         tile t = conf.tiles[pos];
         int target_pos = t == 0 ? size - 1 : t - 1;
-        int diffX = abs(target_pos % size - pos % size);  // compare distances from left border
-        int diffY = abs(target_pos / size - pos / size);  // compare distances from top border
+        int diffX = abs(target_pos % game_side - pos % game_side);  // compare distances from left border
+        int diffY = abs(target_pos / game_side - pos / game_side);  // compare distances from top border
         total_distance += diffX + diffY;
     }
 
-    return total_distance / 2;  // remove duplicates
+    return total_distance;
 }
 
 int count_inversions(const vector<tile>& tiles) {
@@ -76,8 +77,7 @@ int count_inversions(const vector<tile>& tiles) {
  * @param tiles
  * @return zero-based row number of blank tile in tiles
  */
-int get_blank_tile_row(const vector<tile>& tiles) {
-    int game_side = (int) sqrt(tiles.size());
+int get_blank_tile_row(const vector<tile>& tiles, int game_side) {
     for (int pos = (int)(tiles.size() - 1); pos >= 0; --pos) {
         if (tiles[pos] == 0) {
             return pos / game_side;
@@ -93,6 +93,7 @@ void sliding_blocks() {
     int game_size;
     cin >> game_size;                // e.g. 8-puzzle
     tiles_count = game_size + 1;  // there are 9 squares
+    game_side = (int) sqrt(tiles_count);
 
     vector<tile> tiles((size_t) tiles_count);
     for (tile& t : tiles) {
@@ -101,7 +102,7 @@ void sliding_blocks() {
     config start(tiles);
 
     cout << start << endl;
-    cout << manhattan_distance_to_goal(start) << endl;
+    cout << manhattan_distance_to_goal(start, game_size) << endl;
 }
 
 int main(int argc, const char* const* argv) {
@@ -117,17 +118,21 @@ int main(int argc, const char* const* argv) {
     }
 }
 
-TEST_CASE("manhattan distance example from wikipedia") {
+TEST_CASE("manhattan distance") {
     // https://en.wikipedia.org/wiki/Admissible_heuristic
-    vector<tile> tiles = {
-            4, 6, 3, 8,
-            7, 12, 9, 14,
-            15, 13, 1, 5,
-            2, 10, 11, 0
-    };
-    config conf(tiles);
-    int distance = manhattan_distance_to_goal(conf);
-    CHECK(distance == 36);
+    CHECK(36 == manhattan_distance_to_goal(config(vector<tile>({4, 6, 3, 8,
+                                                                7, 12, 9, 14,
+                                                               15, 13, 1, 5,
+                                                                2, 10, 11, 0})), 4));
+
+    CHECK(0 == manhattan_distance_to_goal(config(vector<tile>({1, 2, 3,
+                                                               4, 5, 6,
+                                                               7, 8, 0})), 3));
+
+
+    CHECK((2 + 2 + 1 + 1) == manhattan_distance_to_goal(config(vector<tile>({1, 2, 3,
+                                                                             4, 0, 6,
+                                                                             5, 7, 8})), 3));
 }
 
 
@@ -141,12 +146,12 @@ TEST_CASE("count inversions") {
 TEST_CASE("get zero-based row number of blank tile") {
     CHECK(1 == get_blank_tile_row({1, 2, 3,
                                    4, 0, 5,
-                                   6, 7, 8}));
+                                   6, 7, 8}, 3));
     CHECK(2 == get_blank_tile_row({1, 2, 3,
                                    4, 8, 5,
-                                   6, 7, 0}));
+                                   6, 7, 0}, 3));
     CHECK(3 == get_blank_tile_row({1, 2, 3, 10,
                                    4, 9, 5, 11,
                                    6, 7, 8, 12,
-                                   13, 14, 15, 0}));
+                                   13, 14, 15, 0}, 4));
 }
