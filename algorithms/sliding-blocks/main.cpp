@@ -5,6 +5,8 @@
 #include <vector>
 #include <cmath>
 #include <queue>
+#include <functional>
+#include <unordered_set>
 
 using namespace std;
 
@@ -51,6 +53,17 @@ public:
             out << endl;
         }
         return out;
+    }
+};
+
+struct config_hash {
+    size_t operator()(const config& conf) const {
+        std::hash<tile> hash_fn;
+        size_t seed = 0;
+        for (int tile : conf.tiles) {
+            seed ^= hash_fn(tile) + 0x9e3779b9 + (seed<<6) + (seed>>2);
+        }
+        return seed;
     }
 };
 
@@ -144,7 +157,7 @@ int a_star(const config& start, int grid_size) {
     // distance measures how much changes we made already on the start
     // the heuristic measures how far is the config from the goal
     typedef tuple<int, int, config, config> state;
-    vector<config> visited; // TODO: replace with unordered_set
+    unordered_set<config, config_hash> visited;
     priority_queue<state, vector<state>, greater<state>> queue;
 
     queue.push(make_tuple(
@@ -158,14 +171,14 @@ int a_star(const config& start, int grid_size) {
         state current = queue.top(); queue.pop();
         int distance = get<1>(current);
         config conf = get<2>(current);
-        visited.push_back(conf);
+        visited.insert(conf);
 
         if (is_goal(conf)) {
             return distance;
         }
 
         for (config next : generate_moves(conf, grid_size)) {
-            if (contains<config>(visited, next)) {
+            if (visited.find(next) != visited.end()) {
                 continue;
             }
 
