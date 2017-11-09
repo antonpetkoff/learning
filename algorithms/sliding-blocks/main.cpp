@@ -286,7 +286,11 @@ void sliding_blocks() {
 
 //    cout << start << endl;
 //    cout << manhattan_distance_to_goal(start, game_size) << endl;
-    a_star(start, grid_size);
+    if (is_solvable(start, grid_size)) {
+        a_star(start, grid_size);
+    } else {
+        cout << "puzzle not solvable" << endl;
+    }
 }
 
 int main(int argc, const char* const* argv) {
