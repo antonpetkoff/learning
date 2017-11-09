@@ -18,7 +18,6 @@ bool contains(const vector<T>& list, const T& item) {
 }
 
 int tiles_count;
-int grid_size;
 
 typedef int tile;
 struct config {
@@ -171,8 +170,6 @@ vector<config> generate_moves(const config& conf, int grid_size) {
 
 config NULL_CONFIG = config();
 
-map<config, config> parent;
-
 string get_transition(const config& from, const config& to, int grid_size) {
     int from_row = from.get_blank_row(grid_size);
     int from_col = from.get_blank_column(grid_size);
@@ -227,6 +224,7 @@ int a_star(const config& start, int grid_size) {
     typedef tuple<int, int, config, config> state;
     unordered_set<config, config_hash> visited;
     priority_queue<state, vector<state>, greater<state>> queue;
+    map<config, config> parent;
 
     queue.push(make_tuple(
         0 + manhattan_distance_to_goal(start, grid_size),
@@ -248,11 +246,11 @@ int a_star(const config& start, int grid_size) {
                 moves.pop();
             }
 
-            stack<config> path = construct_path(conf, parent);
-            while (!path.empty()) {
-                cout << path.top() << endl;
-                path.pop();
-            }
+//            stack<config> path = construct_path(conf, parent);
+//            while (!path.empty()) {
+//                cout << path.top() << endl;
+//                path.pop();
+//            }
             return distance;
         }
 
@@ -277,8 +275,8 @@ int a_star(const config& start, int grid_size) {
 void sliding_blocks() {
     int game_size;
     cin >> game_size;                // e.g. 8-puzzle
-    tiles_count = game_size + 1;  // there are 9 squares
-    grid_size = (int) sqrt(tiles_count);
+    int tiles_count = game_size + 1;  // there are 9 squares
+    int grid_size = (int) sqrt(tiles_count);
 
     vector<tile> tiles((size_t) tiles_count);
     for (tile& t : tiles) {
@@ -286,12 +284,13 @@ void sliding_blocks() {
     }
     config start(tiles);
 
-    cout << start << endl;
-    cout << manhattan_distance_to_goal(start, game_size) << endl;
+//    cout << start << endl;
+//    cout << manhattan_distance_to_goal(start, game_size) << endl;
+    a_star(start, grid_size);
 }
 
 int main(int argc, const char* const* argv) {
-    int run_tests = true;
+    int run_tests = false;
 
     if (run_tests) {
         doctest::Context ctx;
