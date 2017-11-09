@@ -39,6 +39,14 @@ public:
         }
     }
 
+    int get_blank_row(int grid_size) const {
+        return blank_tile_index == -1 ? -1 : blank_tile_index / grid_size;
+    }
+
+    int get_blank_column(int grid_size) const {
+        return blank_tile_index == -1 ? -1 : blank_tile_index % grid_size;
+    }
+
     bool operator==(const config& other) const {
         return tiles == other.tiles && blank_tile_index == other.blank_tile_index;
     }
@@ -165,6 +173,42 @@ config NULL_CONFIG = config();
 
 map<config, config> parent;
 
+string get_transition(const config& from, const config& to, int grid_size) {
+    int from_row = from.get_blank_row(grid_size);
+    int from_col = from.get_blank_column(grid_size);
+    int to_row = to.get_blank_row(grid_size);
+    int to_col = to.get_blank_column(grid_size);
+
+    string direction;
+
+    if (from_row < to_row) {
+        direction = "up";
+    } else if (from_row > to_row) {
+        direction = "down";
+    } else if (from_col < to_col) {
+        direction = "left";
+    } else if (from_col > to_col) {
+        direction = "right";
+    }
+
+    return direction;
+}
+
+stack<string> construct_moves(const config& goal, map<config, config>& cameFrom, int grid_size) {
+    stack<string> moves;
+    config current = goal;
+    config previous = cameFrom[current];
+
+    while (previous != NULL_CONFIG) {
+        string transition = get_transition(previous, current, grid_size);
+        moves.push(transition);
+        current = previous; // we move back in time
+        previous = cameFrom[previous];
+    }
+
+    return moves;
+}
+
 stack<config> construct_path(const config& goal, map<config, config>& cameFrom) {
     stack<config> path;
     config previous = goal;
@@ -198,6 +242,12 @@ int a_star(const config& start, int grid_size) {
         visited.insert(conf);
 
         if (is_goal(conf)) {
+            stack<string> moves = construct_moves(conf, parent, grid_size);
+            while (!moves.empty()) {
+                cout << moves.top() << endl;
+                moves.pop();
+            }
+
             stack<config> path = construct_path(conf, parent);
             while (!path.empty()) {
                 cout << path.top() << endl;
