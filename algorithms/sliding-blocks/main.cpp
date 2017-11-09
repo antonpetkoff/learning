@@ -311,4 +311,11 @@ TEST_CASE("a star finds distance to goal") {
                                                        0, 7, 8})), 3);
 
     CHECK(distance_to_goal == 2);
+
+    distance_to_goal = a_star(config(vector<tile>({5,1,7,3,
+                                                   9,2,11,4,
+                                                   13,6,15,8,
+                                                   0,10,14,12})), 4);
+    // TODO: not sure about the optimiality here
+    CHECK(distance_to_goal == 15);
 }
