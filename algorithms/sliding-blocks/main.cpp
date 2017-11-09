@@ -7,6 +7,8 @@
 #include <queue>
 #include <functional>
 #include <unordered_set>
+#include <map>
+#include <stack>
 
 using namespace std;
 
@@ -24,6 +26,10 @@ public:
     vector<tile> tiles;
     int blank_tile_index;
 
+    config() {
+        blank_tile_index = -1;
+    }
+
     config(const vector<tile> &_tiles, int _blank_tile_index = -1) : tiles(_tiles) {
         if (_blank_tile_index == -1) {
             auto blank_index = find(tiles.begin(), tiles.end(), 0);
@@ -37,8 +43,12 @@ public:
         return tiles == other.tiles && blank_tile_index == other.blank_tile_index;
     }
 
+    bool operator!=(const config& other) const {
+        return !operator==(other);
+    }
+
     bool operator<(const config& other) const {
-        return false;   // TODO: mocked
+        return tiles < other.tiles;
     }
 
     friend ostream& operator<<(ostream& out, const config& conf) {
@@ -151,7 +161,21 @@ vector<config> generate_moves(const config& conf, int grid_size) {
     return moves;
 }
 
-config NULL_STATE = config(vector<tile>({}));
+config NULL_CONFIG = config();
+
+map<config, config> parent;
+
+stack<config> construct_path(const config& goal, map<config, config>& cameFrom) {
+    stack<config> path;
+    config previous = goal;
+
+    while (previous != NULL_CONFIG) {
+        path.push(previous);
+        previous = cameFrom[previous];
+    }
+
+    return path;
+}
 
 int a_star(const config& start, int grid_size) {
     // distance measures how much changes we made already on the start
@@ -164,7 +188,7 @@ int a_star(const config& start, int grid_size) {
         0 + manhattan_distance_to_goal(start, grid_size),
         0,
         start,
-        NULL_STATE
+        NULL_CONFIG
     ));
 
     while (!queue.empty()) {
@@ -174,6 +198,11 @@ int a_star(const config& start, int grid_size) {
         visited.insert(conf);
 
         if (is_goal(conf)) {
+            stack<config> path = construct_path(conf, parent);
+            while (!path.empty()) {
+                cout << path.top() << endl;
+                path.pop();
+            }
             return distance;
         }
 
@@ -188,6 +217,7 @@ int a_star(const config& start, int grid_size) {
                 next,
                 conf
             ));
+            parent[next] = conf;
         }
     }
 
