@@ -114,7 +114,8 @@ int count_inversions(const vector<tile>& tiles) {
     int count = 0;
     for (int i = 0; i < tiles.size() - 1; ++i) {
         for (int j = i + 1; j < tiles.size(); ++j) {
-            if (tiles[i] > tiles[j]) {
+            // ignore the empty tile
+            if (tiles[i] && tiles[j] && tiles[i] > tiles[j]) {
                 count++;
             }
         }
@@ -146,8 +147,13 @@ bool is_solvable(const config& conf, int grid_size) {
     }
 
     int blank_tile_row = get_blank_tile_row(conf.tiles, grid_size);
+    int blank_tile_row_from_bottom = grid_size - blank_tile_row;
 
-    return is_odd(blank_tile_row) == is_odd(inversions_count);
+    if (is_odd(blank_tile_row_from_bottom)) {
+        return is_even(inversions_count);
+    } else {
+        return is_odd(inversions_count);
+    }
 }
 
 vector<config> generate_moves(const config& conf, int grid_size) {
