@@ -1,16 +1,27 @@
-# state representation - list of N integers (columns),
-#   each integer is the row of the queen in that column
-# initial state - each queen in its own column on a random row
-# only one operator - move queen in her own column
-# conflict calculation - TODO
+#!/usr/bin/env python3
+# large solutions can be written to file with Unix piping and file redirection
+# example for N=200: echo 200 | ./min-conflicts.py > solution_file
+# remember to add execution permissions to this script
 
-# MinConflicts algorithm
-# pick a queen randomly from all N queens
-# move that queen in a better position with less conflicts
-#   if there are multiple equally better positions, break the tie randomly
-#   if there isn't a better row position for that queen, choose another queen
-# repeat
+"""
+solution description:
+
+state representation - list of N integers (columns),
+  each integer is the row of the queen in that column
+initial state - each queen in its own column on a random row
+only one operator - move queen in her own column
+conflict calculation - check only row and diagonal conflicts
+
+MinConflicts algorithm
+pick a queen randomly from all N queens
+move that queen in a better position with less conflicts
+  if there are multiple equally better positions, break the tie randomly
+  if there isn't a better row position for that queen, choose another queen
+repeat
+"""
+
 import random
+import sys
 
 
 def stringify(state, n):
@@ -27,6 +38,7 @@ def neighbour_hits(state, n, queen_row, queen_col):
         return abs(col - queen_col) == abs(state[col] - queen_row)
 
     def is_hit(col):
+        # no need to check column conflicts, because the state ensures none
         return is_row_hit(col) or is_diagonal_hit(col)
 
     return sum(map(lambda q: 1 if is_hit(q) else 0,
@@ -34,17 +46,12 @@ def neighbour_hits(state, n, queen_row, queen_col):
 
 
 def pick_index(state, predicate, n):
-    return random.choice(filter(
-        lambda col: predicate(state[col]), range(n)))
-
-
-def generate_next_conflicts(state, n, column):
-    # we can stay in the current row
-    return [neighbour_hits(state, n, row, column) for row in range(n)]
+    return random.choice(list(filter(
+        lambda col: predicate(state[col]), range(n))))
 
 
 def min_conflicts(n, iterations=1000):
-    solution = range(n)
+    solution = list(range(n))
     random.shuffle(solution)
 
     for i in range(iterations):
@@ -58,7 +65,8 @@ def min_conflicts(n, iterations=1000):
         column = pick_index(conflicts, lambda conflicts: conflicts > 0, n)
 
         # generate next possible row moves for the queen in that column
-        next_move_conflicts = generate_next_conflicts(solution, n, column)
+        next_move_conflicts = [neighbour_hits(solution, n, row, column)
+                               for row in range(n)]
 
         # find move with minimal conflicts, we can stay at current solution
         optimal_move = min(next_move_conflicts)
@@ -71,13 +79,13 @@ def min_conflicts(n, iterations=1000):
 
 
 def main():
-    # n = input('Enter N: ')
-    n = 8
+    n = int(sys.stdin.readline())
+
     try:
         solution = min_conflicts(n)
         print(stringify(solution, n))
     except Exception as e:
-        print e.message
+        print(e.message)
 
 
 if __name__ == '__main__':
