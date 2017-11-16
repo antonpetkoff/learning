@@ -35,3 +35,55 @@ def matchPerson2(person: Person2): String = person match {
 }
 
 matchPerson2(new Person2("George", "Skeleta"))
+
+import scala.util.Random
+
+Stream.continually{Random nextInt 2}.take(10).toList
+
+Random.nextInt(2)
+
+List(1, 2, 3).fold(0) { (sum: Int, v: Int) =>
+  sum + v
+}
+
+val values = List(1, 2, 3, 4, 5)
+val weights = List(10, 3, 7, 15, 30)
+val knapsack: Vector[Int] = Vector(0, 1, 0, 0, 1)
+
+val (wSum, vSum) = knapsack.zipWithIndex.fold((0, 0)) {
+  case ((wSum, vSum), (taken, index)) => {
+    (wSum + taken * weights(index), vSum + taken * values(index))
+  }
+}
+
+//implicit object TupleNumeric extends Numeric[(Int, Int)] {
+//
+//}
+
+
+//val knapsackValue = knapsack.zip(values).fold(0) {
+//  case (sum: Int, (taken: Int, value: Int)) => sum + (taken * value)
+//}
+//
+//val knapsackWeight = knapsack.zip(weights).fold(0) {
+//  case (sum: Int, (taken: Int, weight: Int)) => sum + (taken * weight)
+//}
+
+// incorrect attempt, it seems that fold expects a lower bound accumulator type
+// TODO: type variance
+//def knapsackSum(knapsack: Seq[Int])(values: Seq[Int]): Int = {
+//  knapsack.zip(values).fold(0) {
+//    case (sum: Int, (taken: Int, value: Int)) => sum + taken * value
+//  }
+//}
+
+def sumItems(knapsack: Seq[Int])(values: Seq[Int]): Int = {
+  knapsack.zip(values).foldLeft(0) {
+    case (sum: Int, (taken: Int, value: Int)) => sum + taken * value
+  }
+}
+
+// notice the underscore for partial application
+val knapsackSumOf = sumItems(knapsack)(_)
+val knapsackValue = knapsackSumOf(values)
+val knapsackWeight = knapsackSumOf(weights)
