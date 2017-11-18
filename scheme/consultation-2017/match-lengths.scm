@@ -1,0 +1,44 @@
+(require rackunit rackunit/text-ui)
+
+; Задача 4. Да се дефинира предикат (match-lenghts? l1 l2).
+; l1 и l2 са непразни списъци от списъци от числа.
+; Ако l1 = (a1 a2 … ak), а l2 = (b1 b2 … bk), предикатът да връща истина, когато
+; разликите в дължините на всяка двойка съответни списъци ai и bi е еднаква.
+;
+; Пример:
+; (match-lengths? ‘( () (1 2) (3 4 5)) ‘( (1) (2 3 4) (5 6 7 8))) -> #t,
+; (match-lengths? ‘( () (1 2) (3 4 5)) ‘( () (2 3 4) (5 6 7))) -> #f
+
+(define (zip a b)
+  (if (or (null? a) (null? b))
+      '()
+      (cons (list (car a) (car b))
+            (zip  (cdr a) (cdr b)))))
+
+(define (for-all? l p)
+  (foldl (lambda (acc x)
+           (and acc (p x)))
+         #t
+         l))
+
+(define (match-lengths? l1 l2)
+  (let ((length-differences (map (lambda (a b)
+                                   (abs (- (length a)
+                                           (length b))))
+                                 l1
+                                 l2)))
+    (eq? (length (filter (lambda (x)
+                           (eq? x (car length-differences)))
+                         length-differences))
+         (length l1))))
+
+
+(define match-lengths?-tests
+  (test-suite
+    "Tests for match-lengths?"
+
+    (check-true (match-lengths? '(() (1 2) (3 4 5)) '((1) (2 3 4) (5 6 7 8))))
+    (check-false (match-lengths? '(() (1 2) (3 4 5)) '(() (2 3 4) (5 6 7))))
+))
+
+(run-tests match-lengths?-tests)
