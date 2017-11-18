@@ -18,10 +18,10 @@
 ; (min 9 2 3 1 4) -> 1
 ; range |> map |> filter |> min
 (define (min-sum-digit a b k)
-  (define (digit-sum-divisible-by-k number)
-    (= 0 (remainder (sum-digits number) k)))
+  (define (digit-sum-divisible-by-k? number)
+    (zero? (remainder (sum-digits number) k)))
   (let* ((numbers (range a (+ b 1)))
-         (divisible (filter digit-sum-divisible-by-k numbers)))
+         (divisible (filter digit-sum-divisible-by-k? numbers)))
     (apply min divisible)))
 
 ; Note: accumulate can also be used for this problem
