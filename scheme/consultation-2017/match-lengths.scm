@@ -15,11 +15,9 @@
       (cons (list (car a) (car b))
             (zip  (cdr a) (cdr b)))))
 
-(define (for-all? l p)
-  (foldl (lambda (acc x)
-           (and acc (p x)))
-         #t
-         l))
+(define (for-all? p? l)
+  (foldl (lambda (x acc) (and (p? x) acc)) #t l))
+
 
 (define (match-lengths? l1 l2)
   (let ((length-differences (map (lambda (a b)
@@ -31,6 +29,17 @@
                            (eq? x (car length-differences)))
                          length-differences))
          (length l1))))
+
+
+; 2nd solution
+(define (match-lengths? l1 l2)
+  (define length-differences
+    (map (lambda (tuple)
+           (abs (- (length (car tuple))
+                   (length (cadr tuple)))))
+         (zip l1 l2)))
+
+  (for-all? (lambda (x) (= (car length-differences) x)) length-differences))
 
 
 (define match-lengths?-tests
