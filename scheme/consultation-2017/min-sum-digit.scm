@@ -24,6 +24,9 @@
          (divisible (filter digit-sum-divisible-by-k numbers)))
     (apply min divisible)))
 
+; Note: accumulate can also be used for this problem
+; where the null value is the maximum integer
+
 (define min-sum-digit-tests
   (test-suite
     "Tests for min-sum-digit"
