@@ -54,7 +54,7 @@ object KnapsackProblem extends App {
   val GENERATIONS_COUNT: Int = 1000
   val MUTATION_PROBABILITY: Double = 0.3
   val PARENT_COUNT: Int = Math.round(Math.ceil(POPULATION_SIZE * 0.1)).asInstanceOf[Int]
-  val MAX_PRINTS: Int = 5
+  val MAX_PRINTS: Int = 4
   val ELITE_SIZE: Int = Math.round(Math.ceil(itemCount * 0.1)).asInstanceOf[Int]
 
   def evolve: Knapsack = {
@@ -78,50 +78,24 @@ object KnapsackProblem extends App {
       val weakParents = ordered.drop(POPULATION_SIZE - PARENT_COUNT)
       val children = (fitParents ++ weakParents)
         .combinations(2)
-        .map { case List(k1, k2) => {
-          crossover(k1, k2)
-        }}
-
+        .map { case List(k1, k2) => crossover(k1, k2) }
       population = population ++ children
 
       // selection phase
       population = population.sortBy(-fitness(_)).take(POPULATION_SIZE)
 
       if (prints < MAX_PRINTS && (generation == 10 || generation % 100 == 0)) {
-        println(s"generation ${generation}")
-        println(s"population: ${population}")
-        println(s"population fitness: ${population.map(fitness)}")
-        println(s"best fitness = ${fitness(population.maxBy(fitness))}\n")
+        println(fitness(population.maxBy(fitness)))
         prints += 1
       }
       generation += 1
     }
+
     population.maxBy(fitness)
   }
 
-  println("values: " + values)
-  println("weights: " + weights)
-
-  val knapsack = generate(itemCount)
-  println(s"knapsack = ${knapsack}")
-  val knapsackFitness = fitness(knapsack)
-  println(s"knapsackFitness = ${knapsackFitness}")
-  mutate(knapsack)
-  println(s"mutated knapsack = ${knapsack}")
-  println(s"mutated knapsackFitness = ${fitness(knapsack)}")
-
-  val knapsack2 = generate(itemCount)
-  println(s"knapsack2 = ${knapsack2}")
-  println(s"knapsack2Fitness = ${fitness(knapsack2)}")
-
-  val knapsack3 = crossover(knapsack, knapsack2)
-  println(s"knapsack3 after crossover = ${knapsack3}")
-  println(s"knapsack3 fitness = ${fitness(knapsack3)}")
-
-  println("running evolution...")
   val best: Knapsack = evolve
-  println(s"best knapsack: ${best}")
-  println(s"best knapsack fitness: ${fitness(best)}")
+  println(fitness(best))
 }
 
 /*
