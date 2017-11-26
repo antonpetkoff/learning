@@ -1,8 +1,8 @@
 package knapsack
 
 import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
-
 
 object KnapsackProblem extends App {
   sealed abstract class Gene
@@ -24,7 +24,6 @@ object KnapsackProblem extends App {
     Knapsack(newItems)
   }
 
-  // can we use case without match?
   def fitness(knapsack: Knapsack): Int = knapsack match {
     case Knapsack(selection) => {
       selection.zipWithIndex.foldLeft((0, 0)) {
@@ -50,36 +49,40 @@ object KnapsackProblem extends App {
 
   val (capacity, itemCount, values, weights) = readInput()
 
-  val POPULATION_SIZE: Int = itemCount * 2
+  val POPULATION_SIZE: Int = Math.min(itemCount * 2, 100)
   val GENERATIONS_COUNT: Int = 1000
   val MUTATION_PROBABILITY: Double = 0.3
   val PARENT_COUNT: Int = Math.round(Math.ceil(POPULATION_SIZE * 0.1)).asInstanceOf[Int]
   val MAX_PRINTS: Int = 4
-  val ELITE_SIZE: Int = Math.round(Math.ceil(itemCount * 0.1)).asInstanceOf[Int]
+  val ELITE_SIZE: Int = Math.round(Math.ceil(POPULATION_SIZE * 0.1)).asInstanceOf[Int]
 
   def evolve: Knapsack = {
-    var population: Seq[Knapsack] = Stream.continually(generate(itemCount)).take(POPULATION_SIZE).toList
+    var population: mutable.Buffer[Knapsack] = Stream
+      .continually(generate(itemCount))
+      .take(POPULATION_SIZE)
+      .sortBy(-fitness(_))
+      .toBuffer
     var generation: Int = 0
     var prints: Int = 0
 
     while (generation < GENERATIONS_COUNT) {
       // mutation phase
-      population
-        .drop(ELITE_SIZE) // preserve the top
-        .foreach { knapsack => {
-          if (Random.nextDouble < MUTATION_PROBABILITY) {
-            mutate(knapsack)
-          }
-        }}
+      Stream.range(ELITE_SIZE, POPULATION_SIZE).foreach { index =>
+        if (Random.nextDouble < MUTATION_PROBABILITY) {
+          mutate(population(index))
+        }
+      }
 
       // crossover phase
-      val ordered = population.sortBy(-fitness(_))
-      val fitParents = ordered.take(PARENT_COUNT)
-      val weakParents = ordered.drop(POPULATION_SIZE - PARENT_COUNT)
-      val children = (fitParents ++ weakParents)
+//      val ordered = population.sortBy(-fitness(_))
+//      val fitParents = ordered.take(PARENT_COUNT)
+//      val weakParents = ordered.drop(POPULATION_SIZE - PARENT_COUNT)
+//      val children = (fitParents ++ weakParents)
+      val children = population
+        .take(PARENT_COUNT)
         .combinations(2)
-        .map { case List(k1, k2) => crossover(k1, k2) }
-      population = population ++ children
+        .map { case ArrayBuffer(k1: Knapsack, k2: Knapsack) => crossover(k1, k2) }
+      population.appendAll(children)
 
       // selection phase
       population = population.sortBy(-fitness(_)).take(POPULATION_SIZE)
@@ -97,10 +100,3 @@ object KnapsackProblem extends App {
   val best: Knapsack = evolve
   println(fitness(best))
 }
-
-/*
-5 3
-2 3
-5 1
-3 2
- */
