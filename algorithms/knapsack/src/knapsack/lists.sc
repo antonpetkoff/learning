@@ -35,3 +35,6 @@ def matchPerson2(person: Person2): String = person match {
 }
 
 matchPerson2(new Person2("George", "Skeleta"))
+
+val l = List(1, 2, 3)
+l.combinations(2).toList
