@@ -4,7 +4,6 @@ from __future__ import division
 import csv
 import copy
 import random
-from math import ceil
 from collections import Counter
 from statistics import mean
 
@@ -18,16 +17,6 @@ def read_votes(filename):
     return data
 
 
-def train_test_split(data, test_size=0.2, random_seed=42):
-    random.seed(random_seed)
-    indices = list(range(len(data)))
-    random.shuffle(indices)
-    split_pivot = int(ceil(test_size * len(data)))   # 20 percent are test data
-    test_set = list(map(lambda i: data[i], indices[:split_pivot]))
-    train_set = list(map(lambda i: data[i], indices[split_pivot:]))
-    return (train_set, test_set)
-
-
 def get_features(sample):
     return sample[:16]
 
@@ -36,8 +25,8 @@ def get_label(sample):
     return sample[16]
 
 
-def accuracy(train_set, test_set, k=3):
-    matches = map(lambda s: predict(train_set, s, k) == get_label(s), test_set)
+def accuracy(train_set, test_set, predict):
+    matches = map(lambda s: predict(s) == get_label(s), test_set)
     return Counter(matches)[True] / len(test_set)
 
 
@@ -47,7 +36,7 @@ def chunk(l, n):
         yield l[i:i + n]
 
 
-def cross_validation_score(data, k=3, chunk_count=10, random_seed=42):
+def cross_validation_score(data, predict, chunk_count=10, random_seed=42):
     data_set = data[:]
     random.seed(random_seed)
     random.shuffle(data_set)
@@ -57,7 +46,7 @@ def cross_validation_score(data, k=3, chunk_count=10, random_seed=42):
     for index, split in enumerate(splits):
         test_set = split
         train_set = sum([x for i, x in enumerate(splits) if i != index], [])
-        test_scores.append(accuracy(train_set, test_set, k))
+        test_scores.append(accuracy(train_set, test_set, predict))
 
     return mean(test_scores)
 
@@ -121,5 +110,13 @@ data = read_votes('votes.csv')
 feature_probs = get_feature_probabilities(data)
 class_probs = get_class_probabilities(data)
 
+
 print(data[0])
 print(predict(class_probs, feature_probs, data[0]))
+
+
+def predictor(sample):
+    return predict(class_probs, feature_probs, sample)
+
+
+print(cross_validation_score(data, predictor, chunk_count=10, random_seed=1))
