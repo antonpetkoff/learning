@@ -2,6 +2,7 @@
 
 from __future__ import division
 import csv
+import copy
 import random
 from math import ceil
 from collections import Counter
@@ -61,8 +62,8 @@ def cross_validation_score(data, k=3, chunk_count=10, random_seed=42):
     return mean(test_scores)
 
 
-def get_feature_frequences(data):
-    feature_count = len(data[0])
+def get_feature_probabilities(data):
+    feature_count = len(data[0]) - 1
     freq = {}
     for feature_id in range(feature_count):
         freq[feature_id] = {}
@@ -76,17 +77,29 @@ def get_feature_frequences(data):
         for feature_id, value in enumerate(get_features(sample)):
             freq[feature_id][value][label] += 1
 
-    return freq
+    probs = copy.deepcopy(freq)
+    for feature_id in range(feature_count):
+        for label in ['republican', 'democrat']:
+            total = 0
+            for value in ['y', 'n', '?']:
+                total += freq[feature_id][value][label]
+
+            for value in ['y', 'n', '?']:
+                prob = freq[feature_id][value][label] / total
+                probs[feature_id][value][label] = prob
+
+    return probs
 
 
 def get_class_probabilities(data):
     total = len(data)
     freq = Counter(map(get_label, data))
-    is_republican = freq['republican'] / total
-    is_democrat = freq['democrat'] / total
-    return (is_republican, is_democrat)
+    return {
+        'republican': freq['republican'] / total,
+        'democrat': freq['democrat'] / total
+    }
 
 
 data = read_votes('votes.csv')
-print(get_feature_frequences(data))
+print(get_feature_probabilities(data))
 print(get_class_probabilities(data))
