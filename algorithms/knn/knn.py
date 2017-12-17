@@ -36,4 +36,4 @@ def euclidian_distance(sample1, sample2):
 
 
 def predict(train_set, sample, k=3, distance=euclidian_distance):
-    pass
+    return sorted(train_set, key=lambda s: distance(s, sample))[:k]
