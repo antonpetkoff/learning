@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from __future__ import division
 import csv
 import random
@@ -7,7 +9,7 @@ from collections import Counter
 
 def read_iris(filename):
     data = []
-    with open(filename, 'rb') as csvfile:
+    with open(filename, 'r') as csvfile:
         data_set = csv.reader(csvfile, delimiter=',')
         for sample in data_set:
             data.append(list(map(float, sample[:4])) + [sample[4]])
@@ -16,11 +18,11 @@ def read_iris(filename):
 
 def train_test_split(data, test_size=0.2, random_seed=42):
     random.seed(random_seed)
-    indices = range(len(data))
+    indices = list(range(len(data)))
     random.shuffle(indices)
     split_pivot = int(ceil(0.2 * len(data)))   # 20 percent are test data
-    test_set = map(lambda i: data[i], indices[:split_pivot])
-    train_set = map(lambda i: data[i], indices[split_pivot:])
+    test_set = list(map(lambda i: data[i], indices[:split_pivot]))
+    train_set = list(map(lambda i: data[i], indices[split_pivot:]))
     return (train_set, test_set)
 
 
