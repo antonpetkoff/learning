@@ -100,6 +100,26 @@ def get_class_probabilities(data):
     }
 
 
+def predict(class_probs, feature_probs, sample, epsilon=10e-6):
+    classes = {}
+    for label in ['democrat', 'republican']:
+        product = 1
+        for feature_id, value in enumerate(get_features(sample)):
+            prob = feature_probs[feature_id][value][label]
+            prob = epsilon if prob == 0 else prob
+            # TODO: optimize with summation of logarithms
+            product *= (feature_probs[feature_id][value][label])
+        classes[label] = product * class_probs['democrat']
+
+    if classes['democrat'] > classes['republican']:
+        return 'democrat'
+    else:
+        return 'republican'
+
+
 data = read_votes('votes.csv')
-print(get_feature_probabilities(data))
-print(get_class_probabilities(data))
+feature_probs = get_feature_probabilities(data)
+class_probs = get_class_probabilities(data)
+
+print(data[0])
+print(predict(class_probs, feature_probs, data[0]))
