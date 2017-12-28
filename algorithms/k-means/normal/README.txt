@@ -1,0 +1,1 @@
+Synthetic 2-d data with N=100 vectors and M=4 Gaussian clusters
