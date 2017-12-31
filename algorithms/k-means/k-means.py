@@ -3,6 +3,7 @@
 from copy import deepcopy
 from matplotlib import pyplot as plt
 import random
+import sys
 
 # import seaborn as sns
 # import pandas as pd
@@ -28,7 +29,8 @@ def euclidian_distance(sample1, sample2):
 def read_points(filename):
     with open(filename) as file:
         content = file.readlines()
-    return [list(map(float, x.strip().split(' ', 2))) for x in content]
+    return [list(map(float, x.strip().replace('\t', ' ').split(' ', 2)))
+            for x in content]
 
 
 def mean(points, default_fn):
@@ -52,7 +54,7 @@ def train(data_set, k, max_iterations=100, dist=euclidian_distance):
     min_y = min(data_set, key=lambda t: t[1])[1]
     max_x = max(data_set, key=lambda t: t[0])[0]
     max_y = max(data_set, key=lambda t: t[1])[1]
-    print(min_x, min_y, max_x, max_y)
+    # print(min_x, min_y, max_x, max_y)
 
     def get_random_point():
         return [min_x + random.random() * (max_x - min_x),
@@ -86,7 +88,7 @@ def train(data_set, k, max_iterations=100, dist=euclidian_distance):
         error = vector_dist(centroids, centroids_old)
         iterations += 1
 
-    print("finished in %d iterations" % iterations)
+    # print("finished in %d iterations" % iterations)
     # colors = ['r', 'g', 'b', 'y', 'c', 'm']
     # fig, ax = plt.subplots()
     # for i in range(k):
@@ -102,9 +104,20 @@ def train(data_set, k, max_iterations=100, dist=euclidian_distance):
     return centroids
 
 
-random_seed = 2
-vectors = read_points('unbalance/unbalance.txt')
-random.seed(random_seed)
+# run as ./k-means.py path/to/data-set.txt 3
+# where the seconds arguments is an integer k
+def main():
+    try:
+        filename = sys.argv[1]
+        k = int(sys.argv[2])
 
-k = 8
-print(train(vectors, k))
+        random_seed = 2
+        vectors = read_points(filename)
+        random.seed(random_seed)
+        print(train(vectors, k))
+    except Exception as e:
+        print(e.message)
+
+
+if __name__ == '__main__':
+    main()
