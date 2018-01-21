@@ -2,7 +2,6 @@
 
 from __future__ import division
 import csv
-import copy
 import random
 from collections import Counter
 from statistics import mean
@@ -52,23 +51,6 @@ def cross_validation_score(data, predict, chunk_count=10, random_seed=42):
         test_scores.append(accuracy(train_set, test_set, predict))
 
     return mean(test_scores)
-
-
-def predict(class_probs, feature_probs, sample, epsilon=10e-6):
-    pass
-
-
-# class = string
-# tree = {split_attribute_in_node: [(attribute_value, tree|class)]}
-
-# {'Outlook': [
-#     ('Sunny', {'Humidity': [
-#         ('High', 'No'),
-#         ('Normal', 'Yes')
-#     ]}),
-#     ('Overcast', 'Yes'),
-#     ('Rain', {'Wind': []})
-# ]}
 
 
 # takes a list of values
@@ -134,6 +116,28 @@ def make_tree(examples, attributes, parent_examples):
 
 # TODO: randomforest or pre/post-pruning for fighting overfitting
 
+# class = string
+# tree = {split_attribute_in_node: [(attribute_value, tree|class)]}
+
+# {'Outlook': [
+#     ('Sunny', {'Humidity': [
+#         ('High', 'No'),
+#         ('Normal', 'Yes')
+#     ]}),
+#     ('Overcast', 'Yes'),
+#     ('Rain', {'Wind': []})
+# ]}
+
+
+def predict(tree, sample):
+    if isinstance(tree, str):
+        return tree
+    if isinstance(tree, dict):
+        attribute_id = list(tree.keys())[0]
+        subtree = next(subtree for attr_value, subtree in tree[attribute_id]
+                       if attr_value == str(sample[attribute_id]))
+        return predict(subtree, sample)
+
 
 FEATURE_COUNT = 9
 data = read_data('breast-cancer.csv')
@@ -143,6 +147,12 @@ tree = make_tree(data, list(range(FEATURE_COUNT)), data)
 pp = PrettyPrinter(indent=2)
 pp.pprint(tree)
 
-# print(get_label(data[0]))
+# for sample in data:
+#     print(get_label(sample), predict(tree, sample))
 
-# print(cross_validation_score(data, predictor, chunk_count=10, random_seed=1))
+
+def predictor(sample):
+    return predict(tree, sample)
+
+
+print(cross_validation_score(data, predictor, chunk_count=10, random_seed=1))
