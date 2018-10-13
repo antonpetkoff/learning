@@ -78,7 +78,7 @@ def most_frequent_label(examples):
     return Counter(map(get_label, examples)).most_common(1)[0][0]
 
 
-def make_tree(examples, attributes, parent_examples, min_examples=1):
+def make_tree(examples, attributes, parent_examples, min_examples=15):
     if len(set(map(get_label, examples))) == 1:
         return get_label(examples[0])
     if len(examples) < min_examples:
